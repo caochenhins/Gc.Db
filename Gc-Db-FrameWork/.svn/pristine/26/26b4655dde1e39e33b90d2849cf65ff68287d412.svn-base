@@ -1,0 +1,377 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using System.Collections;
+
+namespace Gc.Db
+{
+    public class DbBase
+    {
+       #region Constants and Fields
+       public GcEnumDbType dbType = GcEnumDbType.MsSql;
+       private IDbConnection dbConn = null;
+       private IDbCommand dbCmd = null;
+       private IDbTransaction dbTransaction = null;
+       private bool isStartTrans = false;
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// 执行增、删、改操作,返回影响行数--create by guochao
+        /// </summary>
+        /// <param name="connectionStr">数据库字符串连接</param>
+        /// <param name="cmdText">SQL语句/存储过程/参数化SQL语句</param>
+        /// <param name="cmdType">命令类型:SQL语句/存储过程</param>
+        /// <param name="dbParams">数据库参数数组</param>
+       /// <returns>int</returns>
+        public int Execute(string connectionStr, string cmdText, CommandType cmdType, IDbDataParameter[] dbParams)
+        {
+            int num = 0;
+            if (isStartTrans)
+            {
+                InitTransaction(connectionStr);
+                PrepareCommand(cmdText, cmdType, dbConn, dbCmd, dbTransaction, dbParams);
+                num = dbCmd.ExecuteNonQuery();
+                dbCmd.Parameters.Clear();
+            }
+            else
+            {
+                using (IDbConnection conn = DbOperator.CreateConnection(dbType, connectionStr))
+                {
+                    using (IDbCommand cmd = DbOperator.CreateCommand(dbType))
+                    {
+                        PrepareCommand(cmdText, cmdType, conn, cmd, null, dbParams);
+                        num = cmd.ExecuteNonQuery();
+                        cmd.Parameters.Clear();
+                    }
+                }
+            }
+            return num;
+        }
+
+       /// <summary>
+       /// 执行增、删、改操作,返回影响行数--create by guochao
+       /// </summary>
+       /// <param name="connectionStr">数据库字符串连接</param>
+       /// <param name="cmdText">SQL语句/存储过程/参数化SQL语句</param>
+       /// <param name="cmdType">命令类型:SQL语句/存储过程</param>
+       /// <param name="objParam">object参数对象</param>
+        /// <returns>int</returns>
+       public int ExecuteWithParam(string connectionStr, string cmdText, CommandType cmdType, object objParam)
+        {
+            int num = 0;
+            if (!string.IsNullOrEmpty(cmdText))
+            {
+                if (objParam != null)
+                {
+                    IDbDataParameter[] cmdParams = DbOperator.CreateParamArray(dbType, objParam);
+                    num = Execute(connectionStr, cmdText, cmdType, cmdParams);
+                }
+                else
+                {
+                    num =Execute(connectionStr, cmdText, cmdType, null);
+                }
+            }
+            return num;
+        }
+
+       /// <summary>
+       /// 执行查询操作,返回DataSet--create by guochao
+       /// </summary>
+       /// <param name="connectionStr">数据库字符串连接></param>
+       /// <param name="cmdText">SQL语句/存储过程/参数化SQL语句</param>
+       /// <param name="cmdType">命令类型:SQL语句/存储过程</param>
+       /// <param name="dbParams">数据库参数数组</param>
+       /// <returns>DataSet</returns>
+       public DataSet ExecuteQuery(string connectionStr, string cmdText, CommandType cmdType, IDbDataParameter[] dbParams)
+        {
+            DataSet ds = new DataSet();
+            using (IDbConnection conn = DbOperator.CreateConnection(dbType, connectionStr))
+            {
+                using (IDbCommand cmd =DbOperator.CreateCommand(dbType))
+                {
+                    PrepareCommand(cmdText, cmdType, conn, cmd, null, dbParams);
+                    IDataAdapter da = DbOperator.CreateDataAdapter(dbType,cmd);
+                    da.Fill(ds);
+                    cmd.Parameters.Clear();
+                    return ds;
+                }
+            }
+        }
+
+       /// <summary>
+       /// 执行查询操作,返回DataSet--create by guochao
+       /// </summary>
+       /// <param name="connectionStr">数据库字符串连接</param>
+       /// <param name="cmdText">SQL语句/存储过程/参数化SQL语句</param>
+       /// <param name="cmdType">命令类型:SQL语句/存储过程</param>
+       /// <param name="param">object参数对象</param>
+       /// <returns>DataSet</returns>
+       public DataSet ExecuteQueryWithParam(string connectionStr, string cmdText, CommandType cmdType, object objParam)
+        {
+            DataSet ds = new DataSet();
+            if (!string.IsNullOrEmpty(cmdText))
+            {
+                if (objParam != null)
+                {
+                    IDbDataParameter[] dbParams = DbOperator.CreateParamArray(dbType, objParam);
+                    ds = ExecuteQuery(connectionStr, cmdText, cmdType, dbParams);
+                }
+                else
+                {
+                    ds = ExecuteQuery(connectionStr, cmdText, cmdType, null);
+                }
+            }
+            return ds;
+        }
+
+       /// <summary>
+       /// 执行查询操作,返回IDataReader--create by guochao
+       /// </summary>
+       /// <param name="connectionStr">数据库字符串连接></param>
+       /// <param name="cmdText">SQL语句/存储过程/参数化SQL语句</param>
+       /// <param name="cmdType">命令类型:SQL语句/存储过程</param>
+       /// <param name="dbParams">数据库参数数组</param>
+       /// <returns>IDataReader</returns>
+       public IDataReader ExecuteReader(string connectionStr, string cmdText, CommandType cmdType, IDbDataParameter[] dbParams)
+        {
+            IDbConnection conn = DbOperator.CreateConnection(dbType, connectionStr);
+            IDbCommand cmd = DbOperator.CreateCommand(dbType);
+            PrepareCommand(cmdText, cmdType, conn, cmd, null, dbParams);
+            IDataReader myReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+            cmd.Parameters.Clear();
+            return myReader;
+        }
+
+       /// <summary>
+       /// 执行查询操作,返回IDataReader--create by guochao
+       /// </summary>
+       /// <param name="connectionStr">数据库字符串连接</param>
+       /// <param name="cmdText">SQL语句/存储过程/参数化SQL语句</param>
+       /// <param name="cmdType">命令类型:SQL语句/存储过程</param>
+       /// <param name="objParam">object参数对象</param>
+       /// <returns>IDataReader</returns>
+       public IDataReader ExecuteReaderWithParam(string connectionStr, string cmdText, CommandType cmdType, object objParam)
+        {
+            IDataReader sqlDataReader = null;
+            if (!string.IsNullOrEmpty(cmdText))
+            {
+                if (objParam != null)
+                {
+                    IDbDataParameter[] dbParams = DbOperator.CreateParamArray(dbType, objParam);
+                    sqlDataReader = ExecuteReader(connectionStr, cmdText, cmdType, dbParams);
+                }
+                else
+                {
+                    sqlDataReader = ExecuteReader(connectionStr, cmdText, cmdType, null);
+                }
+            }
+            return sqlDataReader;
+        }
+
+       /// <summary>
+       /// 执行查询操作,返回object--create by guochao
+       /// </summary>
+       /// <param name="connectionStr">数据库字符串连接</param>
+       /// <param name="cmdText">SQL语句/存储过程/参数化SQL语句</param>
+       /// <param name="cmdType">命令类型:SQL语句/存储过程</param>
+       /// <param name="dbParams">数据库参数数组</param>
+       /// <returns>object</returns>
+       public object ExecuteScalar(string connectionStr, string cmdText, CommandType cmdType, IDbDataParameter[] dbParams)
+        {
+            using (IDbConnection conn = DbOperator.CreateConnection(dbType,connectionStr))
+            {
+                using (IDbCommand cmd = DbOperator.CreateCommand(dbType))
+                {
+                    PrepareCommand(cmdText, cmdType, conn, cmd, null, dbParams);
+                    object objValue = cmd.ExecuteScalar();
+                    if ((Object.Equals(objValue, null)) || (Object.Equals(objValue, System.DBNull.Value)))
+                    {
+                        objValue = null;
+                    }
+                    cmd.Parameters.Clear();
+                    return objValue;
+                }
+            }
+        }
+
+       /// <summary>
+       /// 执行查询操作,返回object--create by guochao
+       /// </summary>
+       /// <param name="connectionStr">数据库字符串连接</param>
+       /// <param name="cmdText">SQL语句/存储过程/参数化SQL语句</param>
+       /// <param name="cmdType">命令类型:SQL语句/存储过程</param>
+       /// <param name="objParam">object参数对象</param>
+       /// <returns>object</returns>
+       public object ExecuteScalarWithParam(string connectionStr, string cmdText, CommandType cmdType, object objParam)
+        {
+            object objValue = null;
+            if (!string.IsNullOrEmpty(cmdText))
+            {
+                if (objParam != null)
+                {
+                    IDbDataParameter[] dbParams = DbOperator.CreateParamArray(dbType, objParam);
+                    objValue = ExecuteScalar(connectionStr, cmdText, cmdType, dbParams);
+                }
+                else
+                {
+                    objValue = ExecuteScalar(connectionStr, cmdText, cmdType, null);
+                }
+            }
+            return objValue;
+        }
+
+        /// <summary>
+        /// 创建单个参数对象--create by guochao
+        /// </summary>
+       /// <param name="pramName">参数字段名</param>
+       /// <param name="pramValue">参数字段值</param>
+       /// <returns>IDbDataParameter</returns>
+        public IDbDataParameter CreateParam(string pramName, object pramValue)
+        {
+            IDbDataParameter cmdParam = null;
+            cmdParam = DbOperator.CreateParam(dbType, pramName, pramValue);
+            return cmdParam;
+        }
+
+        /// <summary>
+        /// 开启事务
+        /// </summary>
+        public void BeginTransaction()
+        {
+            isStartTrans = true;
+        }
+
+        /// <summary>
+        /// 关闭事务
+        /// </summary>
+        public void CloseTransaction()
+        {
+            isStartTrans = false;
+            try
+            {
+                CommitTransaction();
+                DisTransaction();
+            }catch(Exception ex)
+            {
+                RollbackTransaction();
+                throw ex;
+            }
+        }
+
+        /// <summary>
+        /// 参数据底层公共操作--create by guochao
+        /// </summary>
+        /// <param name="cmdText">SQL语句/存储过程/参数化SQL语句</param>
+        /// <param name="cmdType">命令类型:SQL语句/存储过程</param>
+        /// <param name="conn">数据为连接对象</param>
+        /// <param name="cmd">执行SQL命令对象</param>
+        /// <param name="trans">数据库事务操作对象</param>
+        /// <param name="dbParms">数据库参数数组</param>
+        private void PrepareCommand(string cmdText, CommandType cmdType, IDbConnection conn, IDbCommand cmd, IDbTransaction trans, IDbDataParameter[] dbParms)
+        {
+            if (conn.State != ConnectionState.Open)
+            {
+                conn.Open();
+            }
+            cmd.Connection = conn;
+            cmd.CommandText = cmdText;
+            if (trans != null)
+            {
+                cmd.Transaction = trans;
+            }
+            cmd.CommandType = cmdType;
+            if (dbParms != null)
+            {
+                foreach (IDbDataParameter parameter in dbParms)
+                {
+                    if ((parameter.Direction == ParameterDirection.InputOutput || parameter.Direction == ParameterDirection.Input) && (parameter.Value == null))
+                    {
+                        parameter.Value = DBNull.Value;
+                    }
+                    cmd.Parameters.Add(parameter);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 提交事务
+        /// </summary>
+        private void CommitTransaction()
+        {
+            if (dbTransaction != null)
+            {
+                dbTransaction.Commit();
+            }
+        }
+
+        /// <summary>
+        /// 回滚事务
+        /// </summary>
+        private void RollbackTransaction()
+        {
+            if (dbTransaction != null)
+            {
+                dbTransaction.Rollback();
+            }
+        }
+
+        /// <summary>
+        /// 初始事务
+        /// </summary>
+        /// <param name="connectionStr"></param>
+        private void InitTransaction(string connectionStr)
+        {
+            if (isStartTrans)
+            {
+                if (dbConn == null)
+                {
+                    dbConn = DbOperator.CreateConnection(dbType, connectionStr);
+                    dbConn.Open();
+                }
+                if (dbCmd == null)
+                {
+                    dbCmd = DbOperator.CreateCommand(dbType);
+                }
+                if (dbTransaction == null)
+                {
+                    dbTransaction = dbConn.BeginTransaction();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 释放事务
+        /// </summary>
+        private void DisTransaction()
+        {
+            if (dbConn != null)
+            {
+                dbConn.Close();
+                dbConn.Dispose();
+            }
+            if (dbCmd != null)
+            {
+                dbCmd.Dispose();
+            }
+            if (dbTransaction != null)
+            {
+                dbTransaction.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="gcDbType"></param>
+        public DbBase(GcEnumDbType gcDbType)
+        {
+            this.dbType = gcDbType;
+        }
+       #endregion
+
+    }
+}

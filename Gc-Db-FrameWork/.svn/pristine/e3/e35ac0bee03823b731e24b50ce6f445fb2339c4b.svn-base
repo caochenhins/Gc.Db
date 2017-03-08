@@ -1,0 +1,25 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using System.Collections;
+
+namespace Gc.Db
+{
+    public class OracleSqlDb : SqlDb, ISqlDb
+    {
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public OracleSqlDb()
+        {
+            base.dbType = GcEnumDbType.Oracle;
+            base.dbBase = new DbBase(base.dbType);
+            base.dbPramStr = DbOperator.CreateParamStr(base.dbType);
+        }
+
+       
+    }
+}

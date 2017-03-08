@@ -1,0 +1,39 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using System.Collections;
+
+namespace Gc.Db
+{
+    public class OleDbSqlDb : SqlDb, ISqlDb
+    {
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public OleDbSqlDb()
+        {
+            base.dbType = GcEnumDbType.OleDb;
+            base.dbBase = new DbBase(base.dbType);
+            base.dbPramStr = DbOperator.CreateParamStr(base.dbType);
+        }
+
+        /// <summary>
+        /// 根据每页数量、当前页数、参数化SQL语句筛选条件及参数/非参数化SQL语句筛选条件、排序字段、排序条件查询数据
+        /// </summary>
+        /// <param name="connectionStr">数据库字符串连接</param>
+        /// <param name="pageSize"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="whereFilter"></param>
+        /// <param name="objParam"></param>
+        /// <param name="orderColumn"></param>
+        /// <param name="orderFilter"></param>
+        /// <returns></returns>
+        public override PageDataResult<List<T>> GetPageList<T>(string connectionStr, int pageSize, int pageIndex, string sqlWhereFilter = "", object objParam = null, string orderColumn = "", string orderFilter = "")
+        {
+            return new PageDataResult<List<T>>();
+        }
+    }
+}

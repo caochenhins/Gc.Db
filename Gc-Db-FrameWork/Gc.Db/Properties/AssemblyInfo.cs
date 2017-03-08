@@ -1,0 +1,37 @@
+﻿using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+
+// 有关程序集的常规信息通过以下
+// 特性集控制。更改这些特性值可修改
+// 与程序集关联的信息。
+[assembly: AssemblyTitle("Gc.Db是一套基于ADO.Net数据库快速开发框架和轻量级半ORM框架。")]
+[assembly: AssemblyDescription("Gc.Db是一套基于ADO.Net数据库快速开发框架和轻量级半ORM框架。1.支持数据库有MSSql、MySql、Oracle、Access。2.对各数据库操作完全是基于接口设计,能够与各种IOC框架很好集成，便于程序解耦。3.对单表提供了ORM功能,同时又封装ado.net常用sql语句、参数化SQL语句、存储过程方法，为MSSql、MySql单表提供了分页功能，提供了开发效率。4.支持单库事务操作。")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("心随梦飞")]
+[assembly: AssemblyProduct("Gc.Db")]
+[assembly: AssemblyCopyright("Copyright @ Gc.Db 2016")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+
+
+//将 ComVisible 设置为 false 将使此程序集中的类型
+//对 COM 组件不可见。  如果需要从 COM 访问此程序集中的类型，
+//请将此类型的 ComVisible 特性设置为 true。
+[assembly: ComVisible(false)]
+
+// 如果此项目向 COM 公开，则下列 GUID 用于类型库的 ID
+[assembly: Guid("7c865ed0-1f7c-43be-8ea7-950ef9bb4734")]
+
+// 程序集的版本信息由下列四个值组成: 
+//
+//      主版本
+//      次版本
+//      生成号
+//      修订号
+//
+//可以指定所有这些值，也可以使用“生成号”和“修订号”的默认值，
+// 方法是按如下所示使用“*”: :
+// [assembly: AssemblyVersion("1.0.*")]
+[assembly: AssemblyVersion("2.8.0.0")]
+[assembly: AssemblyFileVersion("2.8.0.0")]

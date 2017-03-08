@@ -1,0 +1,9 @@
+
+
+nuget setApiKey 4861d848-ff17-4e3a-8d65-eb39a53ae36e
+
+nuget spec
+
+nuget pack Gc.Db.csproj -Prop Configuration=Release
+
+nuget push Gc.Db.2.4.0.0.nupkg

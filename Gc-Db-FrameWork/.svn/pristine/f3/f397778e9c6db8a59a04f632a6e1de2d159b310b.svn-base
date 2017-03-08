@@ -1,0 +1,484 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Gc.Db
+{
+   public class SqlDb
+    {
+       #region Constants and Fields
+       protected GcEnumDbType dbType = GcEnumDbType.MsSql;
+       protected DbBase dbBase = null;
+       protected string dbPramStr = "@";
+       #endregion
+
+       #region Public Methods
+
+       /// <summary>
+       /// 执行增、删、改操作,返回影响行数--create by guochao
+       /// </summary>
+       /// <param name="connectionStr">数据库字符串连接</param>
+       /// <param name="cmdText">SQL语句/存储过程/参数化SQL语句</param>
+       /// <param name="cmdType">命令类型:SQL语句/存储过程</param>
+       /// <param name="dbParams">数据库参数数组</param>
+       /// <returns>int</returns>
+       public int Execute(string connectionStr, string cmdText, CommandType cmdType = CommandType.Text, IDbDataParameter[] dbParams = null)
+       {
+           int num = dbBase.Execute(connectionStr, cmdText, cmdType, dbParams);
+           return num;
+       }
+
+       /// <summary>
+       /// 执行增、删、改操作,返回影响行数--create by guochao
+       /// </summary>
+       /// <param name="connectionStr">数据库字符串连接</param>
+       /// <param name="cmdText">SQL语句/存储过程/参数化SQL语句</param>
+       /// <param name="cmdType">命令类型:SQL语句/存储过程</param>
+       /// <param name="objParam">object参数对象</param>
+       /// <returns>int</returns>
+       public int ExecuteWithParam(string connectionStr, string cmdText, CommandType cmdType = CommandType.Text, object objParam = null)
+       {
+           int num = dbBase.ExecuteWithParam(connectionStr, cmdText, cmdType, objParam);
+            return num;
+       }
+
+       /// <summary>
+       /// 执行查询操作,返回DataSet--create by guochao
+       /// </summary>
+       /// <param name="connectionStr">数据库字符串连接></param>
+       /// <param name="cmdText">SQL语句/存储过程/参数化SQL语句</param>
+       /// <param name="cmdType">命令类型:SQL语句/存储过程</param>
+       /// <param name="dbParams">数据库参数数组</param>
+       /// <returns>DataSet</returns>
+       public DataSet ExecuteQuery(string connectionStr, string cmdText, CommandType cmdType = CommandType.Text, IDbDataParameter[] dbParams = null)
+        {
+            DataSet ds = dbBase.ExecuteQuery(connectionStr, cmdText, cmdType, dbParams);
+            return ds;
+        }
+
+       /// <summary>
+       /// 执行查询操作,返回DataSet--create by guochao
+       /// </summary>
+       /// <param name="connectionStr">数据库字符串连接</param>
+       /// <param name="cmdText">SQL语句/存储过程/参数化SQL语句</param>
+       /// <param name="cmdType">命令类型:SQL语句/存储过程</param>
+       /// <param name="param">object参数对象</param>
+       /// <returns>DataSet</returns>
+       public DataSet ExecuteQueryWithParam(string connectionStr, string cmdText, CommandType cmdType = CommandType.Text, object objParam = null)
+        {
+            DataSet ds = dbBase.ExecuteQueryWithParam(connectionStr, cmdText, cmdType, objParam);
+            return ds;
+        }
+
+       /// <summary>
+       /// 执行查询操作,返回IDataReader--create by guochao
+       /// </summary>
+       /// <param name="connectionStr"数据库字符串连接></param>
+       /// <param name="cmdText">SQL语句/存储过程/参数化SQL语句</param>
+       /// <param name="cmdType">命令类型:SQL语句/存储过程</param>
+       /// <param name="dbParams">数据库参数数组</param>
+       /// <returns>IDataReader</returns>
+       public IDataReader ExecuteReader(string connectionStr, string cmdText, CommandType cmdType = CommandType.Text, IDbDataParameter[] dbParams = null)
+        {
+            IDataReader sqlDataReader = dbBase.ExecuteReader(connectionStr, cmdText, cmdType, dbParams);
+            return sqlDataReader;
+        }
+
+       /// <summary>
+       /// 执行查询操作,返回IDataReader--create by guochao
+       /// </summary>
+       /// <param name="connectionStr">数据库字符串连接</param>
+       /// <param name="cmdText">SQL语句/存储过程/参数化SQL语句</param>
+       /// <param name="cmdType">命令类型:SQL语句/存储过程</param>
+       /// <param name="objParam">object参数对象</param>
+       /// <returns>IDataReader</returns>
+       public IDataReader ExecuteReaderWithParam(string connectionStr, string cmdText, CommandType cmdType = CommandType.Text, object objParam = null)
+        {
+            IDataReader sqlDataReader = dbBase.ExecuteReaderWithParam(connectionStr, cmdText, cmdType, objParam);
+            return sqlDataReader;
+        }
+
+       /// <summary>
+       /// 执行查询操作,返回object--create by guochao
+       /// </summary>
+       /// <param name="connectionStr">数据库字符串连接</param>
+       /// <param name="cmdText">SQL语句/存储过程/参数化SQL语句</param>
+       /// <param name="cmdType">命令类型:SQL语句/存储过程</param>
+       /// <param name="dbParams">数据库参数数组</param>
+       /// <returns>object</returns>
+       public object ExecuteScalar(string connectionStr, string cmdText, CommandType cmdType = CommandType.Text, IDbDataParameter[] dbParams = null)
+        {
+            object objValue = dbBase.ExecuteScalar(connectionStr, cmdText, cmdType, dbParams);
+            return objValue;
+        }
+
+       /// <summary>
+       /// 执行查询操作,返回object--create by guochao
+       /// </summary>
+       /// <param name="connectionStr">数据库字符串连接</param>
+       /// <param name="cmdText">SQL语句/存储过程/参数化SQL语句</param>
+       /// <param name="cmdType">命令类型:SQL语句/存储过程</param>
+       /// <param name="objParam">object参数对象</param>
+       /// <returns>object</returns>
+       public object ExecuteScalarWithParam(string connectionStr, string cmdText, CommandType cmdType = CommandType.Text, object objParam = null)
+        {
+            object objValue = dbBase.ExecuteScalarWithParam(connectionStr, cmdText, cmdType, objParam);
+            return objValue;
+        }
+
+        /// <summary>
+        /// 开启事务
+        /// </summary>
+        public void BeginTransaction()
+        {
+            dbBase.BeginTransaction();
+        }
+
+        /// <summary>
+        /// 关闭事务
+        /// </summary>
+        public void CloseTransaction()
+        {
+            dbBase.CloseTransaction();
+        }
+
+        /// <summary>
+        /// 执行添加操作,返回object(如果设置获取自动增长值,返回为自动增长值,否则返回值为影响行数)--create by guochao
+        /// </summary>
+        /// <typeparam name="T">实体模型名称</typeparam>
+        /// <param name="connectionStr">数据库字符串连接</param>
+        /// <param name="t">实体模型实例化对象</param>
+        /// <returns>object</returns>
+        public object Insert<T>(string connectionStr, T t)
+        {
+            object objValue = null;
+            Type type = typeof(T);
+            string tableName = type.Name;
+            string tmpColumnNames = "[[ColumnNames]]";
+            string tmpColumnValues = "[[ColumnValues]]";
+            StringBuilder sqlBuild = new StringBuilder();
+            sqlBuild.AppendFormat("insert into {0}({1}) values({2});", tableName, tmpColumnNames, tmpColumnValues);
+
+            #region 获取所有非自动增长字段
+            bool isNeedGetIdentityValue = false;
+            List<EntityColumn> noneIdentityColumnList = null;
+            List<EntityColumn> ColumnList = EntityColumnHelper.GetColumnList<T>(t);
+            if (ColumnList != null && ColumnList.Count > 0)
+            {
+                var identityList = (from p in ColumnList where (p.IsIdentity && p.IsGetIdentityValue) select p).ToList<EntityColumn>();
+                if (identityList != null && identityList.Count > 0)
+                {
+                    isNeedGetIdentityValue = true;
+                }
+                var noneIdentityList = (from p in ColumnList where (p.IsIdentity == false) select p).ToList<EntityColumn>();
+                if (noneIdentityList != null && noneIdentityList.Count > 0)
+                {
+                    #region 对非自动增长字段操作
+                    int i = 0;
+                    noneIdentityColumnList = noneIdentityList;
+                    List<IDbDataParameter> dbParamList = new List<IDbDataParameter>();
+                    StringBuilder fieldStr = new StringBuilder();
+                    StringBuilder paramStr = new StringBuilder();
+                    foreach(EntityColumn column in noneIdentityColumnList)
+                    {
+                        fieldStr.Append(column.ColumnName);
+                        paramStr.Append(dbPramStr + column.ColumnName);
+                        if (i != (noneIdentityColumnList.Count - 1))
+                        {
+                            fieldStr.Append(",");
+                            paramStr.Append(",");
+                        }
+                        var dbParam = dbBase.CreateParam(column.ColumnName, column.ColumnValue);
+                        dbParamList.Add(dbParam);
+                        i++;
+                    }
+                    sqlBuild.Replace(tmpColumnNames, fieldStr.ToString());
+                    sqlBuild.Replace(tmpColumnValues, paramStr.ToString());
+                    if (isNeedGetIdentityValue)
+                    {
+                        if ((int)dbType == (int)GcEnumDbType.MsSql)
+                        {
+                            sqlBuild.Append("select @@identity;");
+                        }
+                        else if ((int)dbType == (int)GcEnumDbType.MsSql)
+                        {
+                            sqlBuild.Append("select @@identity;");
+                        }
+                        objValue = ExecuteScalar(connectionStr, sqlBuild.ToString(), CommandType.Text, dbParamList.ToArray());
+                    }
+                    else
+                    {
+                        objValue = Execute(connectionStr, sqlBuild.ToString(), CommandType.Text, dbParamList.ToArray());
+                    }
+                    #endregion
+                }
+            }
+            #endregion
+
+            return objValue;
+        }
+
+        /// <summary>
+        /// 执行删除数据操作,返回影响行数--create by guochao
+        /// </summary>
+        /// <typeparam name="T">实体模型名称</typeparam>
+        /// <param name="connectionStr">数据库字符串连接</param>
+        /// <param name="Id">主键值</param>
+        /// <returns>int</returns>
+        public int Delete<T>(string connectionStr, object Id)
+        {
+            int num = 0;
+            Type type = typeof(T);
+            string tableName = type.Name;
+            EntityColumn column = EntityColumnHelper.GetIdColumn<T>(Id);
+            if (column != null)
+            {
+                List<IDbDataParameter> dbParamList = new List<IDbDataParameter>();
+                StringBuilder cmdText = new StringBuilder();
+                cmdText.AppendFormat("delete from {0} where {1}={2}", tableName, column.ColumnName, dbPramStr + column.ColumnName);
+                IDbDataParameter[] dbParameters = {
+					  dbBase.CreateParam(column.ColumnName, column.ColumnValue)
+			    };
+                num = Execute(connectionStr, cmdText.ToString(), CommandType.Text, dbParameters);
+            }
+            return num;
+        }
+
+        /// <summary>
+        /// 执行编辑操作,返回影响行数--create by guochao
+        /// </summary>
+        /// <typeparam name="T">实体模型名称</typeparam>
+        /// <param name="connectionStr">数据库字符串连接</param>
+        /// <param name="t">实体模型实例化对象</param>
+        /// <returns>int</returns>
+        public int Update<T>(string connectionStr, T t)
+        {
+            int num = 0;
+            Type type = typeof(T);
+            string tableName = type.Name;
+            EntityColumn idColumn = null;
+            List<EntityColumn> noneIdColumnList = null;
+
+            #region 获取所有属性信息
+            List<EntityColumn> columnList = EntityColumnHelper.GetColumnList<T>(t);
+            if (columnList != null && columnList.Count > 0)
+            {
+                var idList = (from p in columnList where (p.IsPk) select p).ToList<EntityColumn>();
+                if (idList != null && idList.Count > 0)
+                {
+                   idColumn=idList[0];
+                }
+                var noneIdList = (from p in columnList where (p.IsPk==false) select p).ToList<EntityColumn>();
+                if (noneIdList != null && noneIdList.Count > 0)
+                {
+                    noneIdColumnList = noneIdList;
+                }
+            }
+            #endregion
+
+            StringBuilder cmdText = new StringBuilder();
+            cmdText.AppendFormat("update {0} set ", type.Name);
+            if ((idColumn != null) && (noneIdColumnList != null && noneIdColumnList.Count > 0))
+            {
+                #region 非主键和主键处理
+                int paramLen = noneIdColumnList.Count + 1;
+                List<IDbDataParameter> dbParamList = new List<IDbDataParameter>();
+                for (int i = 0; i < noneIdColumnList.Count; i++)
+                {
+                    EntityColumn column = noneIdColumnList[i];
+                    cmdText.AppendFormat("{0}={1}", column.ColumnName, dbPramStr + column.ColumnName);
+                    if (i != (noneIdColumnList.Count - 1))
+                    {
+                        cmdText.Append(",");
+                    }
+                    var dbParam = dbBase.CreateParam(column.ColumnName, column.ColumnValue);
+                    dbParamList.Add(dbParam);
+                }
+                cmdText.AppendFormat(" where {0}={1}", idColumn.ColumnName, dbPramStr + idColumn.ColumnName);
+                var idDbParam = dbBase.CreateParam(idColumn.ColumnName, idColumn.ColumnValue);
+                dbParamList.Add(idDbParam);
+                #endregion
+                num = Execute(connectionStr, cmdText.ToString(), CommandType.Text, dbParamList.ToArray());
+            }
+            return num;
+        }
+
+        /// <summary>
+        /// 根据实体主键值查询数据,返回单个实体对象--create by guochao
+        /// </summary>
+        /// <typeparam name="T">实体模型名称</typeparam>
+        /// <param name="connectionStr">数据库字符串连接</param>
+        /// <param name="Id">主键值</param>
+        /// <returns>T</returns>
+        public T Find<T>(string connectionStr, object Id)
+        {
+            T t = default(T);
+            Type type = typeof(T);
+            string tableName = type.Name;
+            EntityColumn column = EntityColumnHelper.GetIdColumn<T>(Id);
+            if (column != null)
+            {
+                StringBuilder cmdText = new StringBuilder();
+                cmdText.AppendFormat("select * from {0} where {1}={2}", tableName, column.ColumnName, dbPramStr + column.ColumnName);
+                IDbDataParameter[] dbParameters = {
+					   dbBase.CreateParam(column.ColumnName,column.ColumnValue)
+			    };
+                IDataReader read = ExecuteReader(connectionStr, cmdText.ToString(), CommandType.Text, dbParameters);
+                if (read != null)
+                {
+                    List<T> list = new List<T>();
+                    DataReaderEntityBuilder<T> readBuild = DataReaderEntityBuilder<T>.CreateBuilder(read);
+                    while (read.Read())
+                    {
+                        list.Add(readBuild.ConverToEntity(read));
+                    }
+                    if (list.Count > 0)
+                    {
+                        t = list[0];
+                    }
+                }
+            }
+            return t;
+        }
+
+        /// <summary>
+        /// 执行查询数据操作,返回泛型列表--create by guochao
+        /// </summary>
+        /// <typeparam name="T">实体模型名称</typeparam>
+        /// <param name="connectionStr">数据库字符串连接</param>
+        /// <param name="sqlWhere">参数化/非参数化查询条件</param>
+        /// <param name="orderFilter">排序条件</param>
+        /// <param name="objParam">object参数对象</param>
+        /// <returns>List<T></returns>
+        public List<T> Select<T>(string connectionStr, string sqlWhere = "", string orderFilter = "", object objParam = null)
+        {
+            IDataReader read;
+            Type type = typeof(T);
+            string tableName = type.Name;
+            List<T> list = null;
+            StringBuilder cmdText = new StringBuilder();
+            cmdText.AppendFormat("select * from [{0}] ", tableName);
+            if (!string.IsNullOrEmpty(sqlWhere))
+            {
+                cmdText.Append(" where " + sqlWhere);
+            }
+            if (!string.IsNullOrEmpty(orderFilter))
+            {
+                cmdText.Append(" order by " + orderFilter);
+            }
+            if (objParam != null)
+            {
+                read = ExecuteReaderWithParam(connectionStr, cmdText.ToString(), CommandType.Text, objParam);
+            }
+            else
+            {
+                read = ExecuteReader(connectionStr, cmdText.ToString(), CommandType.Text, null);
+            }
+            if (read != null)
+            {
+                list = new List<T>();
+                DataReaderEntityBuilder<T> readBuild = DataReaderEntityBuilder<T>.CreateBuilder(read);
+                while (read.Read())
+                {
+                    list.Add(readBuild.ConverToEntity(read));
+                }
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// 执行查询数据操作,返回泛型列表--create by guochao
+        /// </summary>
+        /// <typeparam name="T">实体模型名称</typeparam>
+        /// <param name="connectionStr">数据库字符串连接</param>
+        /// <param name="sqlStr">参数化/非参数化SQL语句</param>
+        /// <param name="objParam">object参数对象</param>
+        /// <returns>List<T></returns>
+        public List<T> Select<T>(string connectionStr, string sqlStr, object objParam=null)
+        {
+            IDataReader read;
+            List<T> list = null;
+            StringBuilder cmdText = new StringBuilder();
+            if (!string.IsNullOrEmpty(sqlStr))
+            {
+                cmdText.Append(sqlStr);
+            }
+            if (objParam != null)
+            {
+                read = ExecuteReaderWithParam(connectionStr, cmdText.ToString(), CommandType.Text, objParam);
+            }
+            else
+            {
+                read = ExecuteReader(connectionStr, cmdText.ToString(), CommandType.Text, null);
+            }
+            if (read != null)
+            {
+                list = new List<T>();
+                DataReaderEntityBuilder<T> readBuild = DataReaderEntityBuilder<T>.CreateBuilder(read);
+                while (read.Read())
+                {
+                    list.Add(readBuild.ConverToEntity(read));
+                }
+            }
+            return list;
+        }
+
+       /// <summary>
+        /// 执行查询数据操作,返回DataSet--create by guochao
+        /// </summary>
+        /// <typeparam name="T">实体模型名称</typeparam>
+        /// <param name="connectionStr">数据库字符串连接</param>
+        /// <param name="sqlStr">参数化/非参数化SQL语句</param>
+        /// <param name="objParam">object参数对象</param>
+        /// <returns>DataSet</returns>
+        public DataSet Select(string connectionStr, string sqlStr, object objParam=null)
+        {
+            DataSet ds;
+            StringBuilder cmdText = new StringBuilder();
+            if (!string.IsNullOrEmpty(sqlStr))
+            {
+                cmdText.Append(sqlStr);
+            }
+            if (objParam != null)
+            {
+                ds = ExecuteQueryWithParam(connectionStr, cmdText.ToString(), CommandType.Text, objParam);
+            }
+            else
+            {
+                ds = ExecuteQuery(connectionStr, cmdText.ToString(), CommandType.Text, null);
+            }
+            return ds;
+        }
+
+        /// <summary>
+        /// 执行分页数据查询操作,返回PageDataResult(PageDataResult包括总记录数、当页查询结果)
+        /// </summary>
+        /// <param name="connectionStr">数据库字符串连接</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页数</param>
+        /// <param name="sqlWhere">参数化/非参数化SQL语句筛选条件</param>
+        /// <param name="objParam">参数化sql语句对应参数</param>
+        /// <param name="orderColumn">排序字段</param>
+        /// <param name="orderFilter">排序条件</param>
+        /// <returns>PageDataResult</returns>
+        public virtual PageDataResult<List<T>> GetPageList<T>(string connectionStr, int pageSize=10, int pageIndex=1, string sqlWhere = "", object objParam = null, string orderColumn = "", string orderSort = "")
+        {
+            return new PageDataResult<List<T>>();
+        }
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public SqlDb()
+        {
+            this.dbBase = new DbBase(dbType);
+            this.dbPramStr = DbOperator.CreateParamStr(dbType);
+        }
+
+       #endregion
+    }
+}

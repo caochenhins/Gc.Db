@@ -1,0 +1,39 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using System.Collections;
+
+namespace Gc.Db
+{
+    public class OracleSqlDb : SqlDb, ISqlDb
+    {
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public OracleSqlDb()
+        {
+            base.dbType = GcEnumDbType.Oracle;
+            base.dbBase = new DbBase(base.dbType);
+            base.dbPramStr = DbOperator.CreateParamStr(base.dbType);
+        }
+
+        /// <summary>
+        /// 执行分页数据查询操作,返回PageDataResult(PageDataResult包括总记录数、当页查询结果)
+        /// </summary>
+        /// <param name="connectionStr">数据库字符串连接</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页数</param>
+        /// <param name="sqlWhere">参数化/非参数化SQL语句筛选条件</param>
+        /// <param name="objParam">参数化sql语句对应参数</param>
+        /// <param name="orderColumn">排序字段</param>
+        /// <param name="orderFilter">排序条件</param>
+        /// <returns>PageDataResult</returns>
+        public override PageDataResult<List<T>> GetPageList<T>(string connectionStr, int pageSize = 10, int pageIndex = 1, string sqlWhere = "", object objParam = null, string orderColumn = "", string orderSort = "")
+        {
+            return new PageDataResult<List<T>>();
+        }
+    }
+}

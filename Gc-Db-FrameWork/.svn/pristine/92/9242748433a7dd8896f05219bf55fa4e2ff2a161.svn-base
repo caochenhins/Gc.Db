@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>心随梦飞</authors>
+    <owners>心随梦飞</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>	<description>Gc.Db是一套基于ADO.Net数据库快速开发框架和轻量级半ORM框架。1.支持数据库有MSSql、MySql、Oracle、Access。2.对各数据库操作完全是基于接口设计,能够与各种IOC框架很好集成，便于程序解耦。3.对单表提供了ORM功能,同时又封装ado.net常用sql语句、参数化SQL语句、存储过程方法，为MSSql、MySql单表提供了分页功能，提供了开发效率。4.支持单库事务操作。</description>
+    <releaseNotes>Gc.Db是一套基于ADO.Net数据库快速开发框架和轻量级半ORM框架。</releaseNotes>
+    <copyright>Copyright 2016</copyright>
+    <tags>ado.net ORM 数据库访问框架</tags>
+  </metadata>
+</package>

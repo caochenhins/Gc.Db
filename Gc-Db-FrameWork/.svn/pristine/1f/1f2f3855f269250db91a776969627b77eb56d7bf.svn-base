@@ -1,0 +1,73 @@
+﻿using Gc.Db;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using TestConsoleApplication;
+using TestGcDb.model;
+
+namespace TestGcDb
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            test2();
+        }
+
+        private static void test1()
+        {
+            string conn1 = "Data Source=.;Initial Catalog=testdb;User ID=sa;Password=123456;";
+            ISqlDb db = new Gc.Db.MsSqlDb();
+            try
+            {
+                PageDataResult<List<UserInfo>> result = db.GetPageList<UserInfo>(conn1,10,1);
+                //var model = db.Find<UserInfo>(conn1,3);
+                //if (model != null)
+                //{
+                //    model.UserName = "vbc";
+                //    db.Update<UserInfo>(conn1,model);
+                   
+                //}
+
+                //db.BeginTransaction();
+                //db.Insert<UserInfo>(conn1, new UserInfo() { UserId = 4, UserName = "he", CreateTime = DateTime.Now });
+                //db.Insert<UserInfo>(conn1, new UserInfo() { UserId = 5, UserName = "haha", CreateTime = DateTime.Now });
+                //db.CloseTransaction();
+            }
+            catch (Exception ex)
+            {
+               
+            }
+           
+        }
+
+        private static void test2()
+        {
+            string conn1 = "Database=Dgcms;Data Source=127.0.0.1;User Id=root;Password=root;";
+            ISqlDb db = new Gc.Db.MySqlDb();
+            try
+            {
+                PageDataResult<List<blog>> result = db.GetPageList<blog>(conn1, 10, 1);
+                var model = db.Find<blog>(conn1, 3);
+                //if (model != null)
+                //{
+                //    model.UserName = "vbc";
+                //    db.Update<UserInfo>(conn1,model);
+
+                //}
+
+                //db.BeginTransaction();
+                //db.Insert<UserInfo>(conn1, new UserInfo() { UserId = 4, UserName = "he", CreateTime = DateTime.Now });
+                //db.Insert<UserInfo>(conn1, new UserInfo() { UserId = 5, UserName = "haha", CreateTime = DateTime.Now });
+                //db.CloseTransaction();
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+        }
+    }
+}

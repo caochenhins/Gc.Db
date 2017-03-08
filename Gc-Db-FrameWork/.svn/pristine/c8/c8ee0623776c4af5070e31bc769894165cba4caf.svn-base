@@ -1,0 +1,106 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using System.Collections;
+
+namespace Gc.Db
+{
+    public class MsSqlDb:SqlDb,ISqlDb
+    {
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public MsSqlDb()
+        {
+            base.dbType = GcEnumDbType.MsSql;
+            base.dbBase = new DbBase(base.dbType);
+            base.dbPramStr = DbOperator.CreateParamStr(base.dbType);
+        }
+
+        /// <summary>
+        /// 执行分页数据查询操作,返回PageDataResult(PageDataResult包括总记录数、当页查询结果)
+        /// </summary>
+        /// <param name="connectionStr">数据库字符串连接</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页数</param>
+        /// <param name="sqlWhere">参数化/非参数化SQL语句筛选条件</param>
+        /// <param name="orderColumn">排序字段</param>
+        /// <param name="orderSort">排序条件</param>
+        /// <param name="objParam">object参数</param>
+        /// <returns>PageDataResult</returns>
+        public override PageDataResult<List<T>> GetPageList<T>(string connectionStr, int pageSize = 10, int pageIndex = 1, string sqlWhere = "", string orderColumn = "", string orderSort = "", object objParam = null) 
+        {
+            PageDataResult<List<T>> dataResult = new PageDataResult<List<T>>();
+
+            try
+            {
+                //相关变量定义
+                Type type = typeof(T);
+                string tableName = type.Name;
+                int startNum = pageSize * (pageIndex - 1) + 1;
+                int endNum = pageSize * pageIndex;
+
+                #region 拼接SQL及对数据库操作
+                if (string.IsNullOrEmpty(orderColumn) && string.IsNullOrEmpty(orderSort))
+                {
+                    EntityColumn column = EntityColumnHelper.GetIdColumn<T>(null);
+                    if (column != null)
+                    {
+                        orderColumn = column.ColumnName;
+                        orderSort = "asc";
+                    }
+                }
+                StringBuilder commonFilter = new StringBuilder();
+                commonFilter.AppendFormat(" from {0}  ", tableName);
+                if (!string.IsNullOrEmpty(sqlWhere))
+                {
+                    commonFilter.AppendFormat(" where {0} ", sqlWhere);
+                }
+                StringBuilder countSql = new StringBuilder("select count(*)  ");
+                countSql.AppendFormat(commonFilter.ToString());
+                object totalNumObj = dbBase.ExecuteScalar(connectionStr, countSql.ToString(), CommandType.Text, null);
+                if (totalNumObj != null)
+                {
+                    dataResult.TotalCount = Convert.ToInt32(totalNumObj);
+                }
+                if (dataResult.TotalCount > 0)
+                {
+                    StringBuilder pageSql = new StringBuilder("select b.*  from ");
+                    pageSql.Append("(");
+                    pageSql.AppendFormat("select ROW_NUMBER() over(order by {0} {1}) num,{0} ", orderColumn, orderSort);
+                    pageSql.AppendFormat(commonFilter.ToString());
+                    pageSql.Append(") ");
+                    pageSql.AppendFormat("a inner join {0} b on a.{1}=b.{1} and  a.num between {2} and {3} ", tableName, orderColumn, startNum, endNum);
+                    IDataReader dataReader;
+                    if (objParam != null)
+                    {
+                        dataReader = dbBase.ExecuteReaderWithParam(connectionStr, pageSql.ToString(), CommandType.Text, objParam);
+                    }
+                    else
+                    {
+                        dataReader = dbBase.ExecuteReader(connectionStr, pageSql.ToString(), CommandType.Text, null);
+                    }
+                    if (dataReader != null)
+                    {
+                        List<T> list = new List<T>();
+                        DataReaderEntityBuilder<T> readBuild = DataReaderEntityBuilder<T>.CreateBuilder(dataReader);
+                        while (dataReader.Read())
+                        {
+                            list.Add(readBuild.ConverToEntity(dataReader));
+                        }
+                        dataResult.Data = list;
+                    }
+                }
+                #endregion
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return dataResult;
+
+        }
+    }
+}

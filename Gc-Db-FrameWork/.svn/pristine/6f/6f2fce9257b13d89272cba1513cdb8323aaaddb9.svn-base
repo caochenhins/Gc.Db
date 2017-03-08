@@ -1,0 +1,241 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using System.Data.SqlClient;
+using System.Data.OracleClient;
+using MySql.Data.MySqlClient;
+using System.Data.OleDb;
+using System.Collections;
+
+namespace Gc.Db
+{
+    /// <summary>
+    /// 数据库类型
+    /// </summary>
+    public enum GcEnumDbType
+    {
+        MsSql = 1,
+        Oracle = 2,
+        MySql = 3,
+        OleDb = 4
+    }
+
+    public class DbOperator
+    {
+        #region public method
+
+        /// <summary>
+        /// 创建数据库连接对象--create by guochao
+        /// </summary>
+        /// <param name="gcType"></param>
+        /// <param name="connectionString"></param>
+        /// <returns></returns>
+        public static IDbConnection CreateConnection(GcEnumDbType gcType, string connectionString)
+        {
+            int dbType = (int)gcType;
+            IDbConnection conn = null;
+            switch (dbType)
+            {
+                case 1:
+                    conn = new SqlConnection(connectionString);
+                    break;
+
+                case 2:
+                    conn = new OracleConnection(connectionString);
+                    break;
+
+                case 3:
+                    conn = new MySqlConnection(connectionString);
+                    break;
+
+                case 4:
+                    conn = new OleDbConnection(connectionString);
+                    break;
+            }
+            return conn;
+        }
+
+        /// <summary>
+        /// 创建DbCommand对象--create by guochao
+        /// </summary>
+        /// <param name="gcType"></param>
+        /// <returns></returns>
+        public static IDbCommand CreateCommand(GcEnumDbType gcType)
+        {
+            int dbType = (int)gcType;
+            IDbCommand cmd = null;
+            switch (dbType)
+            {
+                case 1:
+                    cmd = new SqlCommand();
+                    break;
+
+                case 2:
+                    cmd = new OracleCommand();
+                    break;
+
+                case 3:
+                    cmd = new MySqlCommand();
+                    break;
+
+                case 4:
+                    cmd = new OleDbCommand();
+                    break;
+            }
+            return cmd;
+        }
+
+        /// <summary>
+        /// 创建适配器对象--create by guochao
+        /// </summary>
+        /// <param name="dbType"></param>
+        /// <returns></returns>
+        public static IDataAdapter CreateDataAdapter(GcEnumDbType gcType, IDbCommand cmd)
+        {
+            int dbType = (int)gcType;
+            IDataAdapter dataAdater = null;
+            switch (dbType)
+            {
+                case 1:
+                    dataAdater = new SqlDataAdapter((SqlCommand)cmd);
+                    break;
+
+                case 2:
+                    dataAdater = new OracleDataAdapter((OracleCommand)cmd);
+                    break;
+
+                case 3:
+                    dataAdater = new MySqlDataAdapter((MySqlCommand)cmd);
+                    break;
+
+                case 4:
+                    dataAdater = new OleDbDataAdapter((OleDbCommand)cmd);
+                    break;
+            }
+            return dataAdater;
+        }
+
+        /// <summary>
+        /// 创建单个参数对象--create by guochao
+        /// </summary>
+        /// <param name="gcType"></param>
+        /// <param name="pramName"></param>
+        /// <param name="pramValue"></param>
+        /// <returns></returns>
+        public static IDbDataParameter CreateParam(GcEnumDbType gcType, string pramName, object pramValue)
+        {
+            int dbType = (int)gcType;
+            IDbDataParameter cmdParam = null;
+            pramName = CreateParamStr(gcType) + pramName;
+            switch (dbType)
+            {
+                case 1:
+                    cmdParam = new SqlParameter(pramName, pramValue);
+                    break;
+
+                case 2:
+                    cmdParam = new OracleParameter(pramName, pramValue);
+                    break;
+
+                case 3:
+                    cmdParam = new MySqlParameter(pramName, pramValue);
+                    break;
+
+                case 4:
+                    cmdParam = new OleDbParameter(pramName, pramValue);
+                    break;
+            }
+            return cmdParam;
+        }
+
+        /// <summary>
+        /// 创建参数字符--create by guochao
+        /// </summary>
+        /// <param name="gcType"></param>
+        /// <returns></returns>
+        public static string CreateParamStr(GcEnumDbType gcType)
+        {
+            int dbType = (int)gcType;
+            string prameStr = "@";
+            switch (dbType)
+            {
+                case 1:
+                    prameStr = "@";
+                    break;
+
+                case 2:
+                    prameStr = ":";
+                    break;
+
+                case 3:
+                    prameStr = "?";
+                    break;
+
+                case 4:
+                    prameStr = "@";
+                    break;
+            }
+            return prameStr;
+        }
+
+        /// <summary>
+        /// 根据object参数及值创建参数数组--create by guochao
+        /// </summary>
+        /// <param name="gcType"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        public static IDbDataParameter[] CreateParamArray(GcEnumDbType gcType, object param)
+        {
+            int dbType = (int)gcType;
+            IDbDataParameter[] cmdParams = null;
+            if (param != null)
+            {
+                List<EntityColumn> columnList = EntityColumnHelper.GetParamColumnList(param);
+                if (columnList != null && columnList.Count > 0)
+                {
+                    List<IDbDataParameter> dbParamList = new List<IDbDataParameter>();
+                    foreach (EntityColumn column in columnList)
+                    {
+                        var dbParam = CreateParam(gcType, column.ColumnName, column.ColumnValue);
+                        dbParamList.Add(dbParam);
+                    }
+                    cmdParams = dbParamList.ToArray();
+                }
+            }
+            return cmdParams;
+        }
+
+        /// <summary>
+        /// 创建实现数据访问类接口对象实例
+        /// </summary>
+        /// <param name="gcType"></param>
+        /// <returns></returns>
+        public static ISqlDb CreateDbHelper(GcEnumDbType gcType)
+        {
+            int dbType = (int)gcType;
+            ISqlDb gcDbHelper = null;
+            switch (dbType)
+            {
+                case 1:
+                    gcDbHelper = new MsSqlDb();
+                    break;
+
+                case 2:
+                    gcDbHelper = new OracleSqlDb();
+                    break;
+
+                case 3:
+                    gcDbHelper = new MySqlDb();
+                    break;
+
+                case 4:
+                    gcDbHelper = new OleDbSqlDb();
+                    break;
+            }
+            return gcDbHelper;
+        }
+        #endregion
+    }
+}
