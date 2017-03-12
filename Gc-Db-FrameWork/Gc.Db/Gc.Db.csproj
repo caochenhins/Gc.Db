@@ -48,8 +48,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DbBase.cs" />
-    <Compile Include="DbOperator.cs" />
+    <Compile Include="AdoNetUtility.cs" />
+    <Compile Include="DbUtility.cs" />
     <Compile Include="ISqlDb.cs" />
     <Compile Include="MsSqlDb.cs" />
     <Compile Include="MySqlDb.cs" />

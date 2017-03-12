@@ -40,3 +40,6 @@ E:\郭超\work\Gc-Db-FrameWork\Gc-Db-FrameWork\TestGcDb\bin\Release\Gc.Data.pdb
 E:\郭超\work\Gc.Db\Gc-Db-FrameWork\TestGcDb\bin\Release\TestGcDb.exe.config
 E:\郭超\work\Gc.Db\Gc-Db-FrameWork\TestGcDb\obj\Release\TestGcDb.exe
 E:\郭超\work\Gc.Db\Gc-Db-FrameWork\TestGcDb\obj\Release\TestGcDb.pdb
+E:\郭超\work\github\Gc.Db\Gc-Db-FrameWork\TestGcDb\bin\Release\TestGcDb.exe.config
+E:\郭超\work\github\Gc.Db\Gc-Db-FrameWork\TestGcDb\obj\Release\TestGcDb.exe
+E:\郭超\work\github\Gc.Db\Gc-Db-FrameWork\TestGcDb\obj\Release\TestGcDb.pdb

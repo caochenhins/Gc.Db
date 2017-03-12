@@ -10,20 +10,6 @@ namespace Gc.Db
     public class OracleSqlDb : SqlDb, ISqlDb
     {
 
-        #region Constants and Fields
-
-        /// <summary>
-        /// 数据库类型
-        /// </summary>
-        public override GcEnumDbType dbType { get; set; }
-
-        /// <summary>
-        /// 数据库对应参数关键字
-        /// </summary>
-        public override string dbPramStr { get; set; }
-
-        #endregion
-
         #region Public Methods
 
         /// <summary>
@@ -31,8 +17,8 @@ namespace Gc.Db
        /// </summary>
         public OracleSqlDb()
        {
-           dbType = GcEnumDbType.Oracle;
-           dbPramStr = new DbOperator(dbType).CreateDbParameterStr();
+           DbType = GcEnumDbType.Oracle;
+           DbInsInit();
        }
 
        #endregion

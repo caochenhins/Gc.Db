@@ -10,104 +10,74 @@ namespace Gc.Db
 {
     public class MsSqlDb:SqlDb,ISqlDb
     {
-        #region Constants and Fields
-
-        /// <summary>
-        /// 数据库类型
-        /// </summary>
-        public override GcEnumDbType dbType { get; set; }
-
-        /// <summary>
-        /// 数据库对应参数关键字
-        /// </summary>
-        public override string dbPramStr { get; set; }
-
-        #endregion
 
         #region Public Methods
-
 
         /// <summary>
        /// 构造函数
        /// </summary>
        public MsSqlDb()
        {
-           dbType = GcEnumDbType.MsSql;
-           dbPramStr = new DbOperator(dbType).CreateDbParameterStr();
+           DbType = GcEnumDbType.MsSql;
+           DbInsInit();
        }
 
         /// <summary>
-        /// 执行分页数据查询操作,返回PageResponseData--create by joyet
+        /// 执行分页数据查询操作,返回PageResponseData
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="connectionStr"></param>
         /// <param name="request"></param>
         /// <returns></returns>
-        public override PageResponseData GetPageList<T>(string connectionStr, PageRequestData request) 
+        public override PageResponseData GetPageList<T>(string connectionStr, PageRequestData pageRequest) 
         {
-            PageResponseData dataResult = new PageResponseData();
+            PageResponseData responsResult = new PageResponseData();
             try
             {
                 #region 相关变量定义
-                var dbBase = new DbBase(dbType);
                 Type type = typeof(T);
                 string tableName = type.Name;
-                int startNum = request.PageSize * (request.PageIndex - 1) + 1;
-                int endNum = request.PageSize * request.PageIndex;
-                #endregion
-
-                #region 查询总条数
-                if (string.IsNullOrEmpty(request.OrderColumn) && string.IsNullOrEmpty(request.OrderSort))
-                {
-                    EntityColumn column = new EntityColumnUtility().GetIdColumn<T>(null);
-                    if (column != null)
-                    {
-                        request.OrderColumn = column.ColumnName;
-                        request.OrderSort = "asc";
-                    }
-                }
-                StringBuilder commonFilter = new StringBuilder();
-                commonFilter.AppendFormat(" from {0}  ", tableName);
-                if (!string.IsNullOrEmpty(request.SqlWhere))
-                {
-                    commonFilter.AppendFormat(" where {0} ", request.SqlWhere);
-                }
-                StringBuilder countSql = new StringBuilder("select count(*)  ");
-                countSql.AppendFormat(commonFilter.ToString());
-                object totalNumObj = dbBase.ExecuteScalar(connectionStr, countSql.ToString(), CommandType.Text, null);
-                if (totalNumObj != null)
-                {
-                    dataResult.TotalCount = Convert.ToInt32(totalNumObj);
-                }
+                int startNum = pageRequest.PageSize * (pageRequest.PageIndex - 1) + 1;
+                int endNum = pageRequest.PageSize * pageRequest.PageIndex;
+                var searchEntity = pageRequest.SearchEntityObj;
                 #endregion
 
                 #region 分页查询处理
-                if (dataResult.TotalCount > 0)
+                EntityColumn idColumn = new EntityColumnUtility().GetIdColumn<T>(null);
+                if (idColumn != null)
                 {
-                    StringBuilder pageSql = new StringBuilder("select b.*  from ");
-                    pageSql.Append("(");
-                    pageSql.AppendFormat("select ROW_NUMBER() over(order by {0} {1}) num,{0} ", request.OrderColumn, request.OrderSort);
-                    pageSql.AppendFormat(commonFilter.ToString());
-                    pageSql.Append(") ");
-                    pageSql.AppendFormat("a inner join {0} b on a.{1}=b.{1} and  a.num between {2} and {3} ", tableName, request.OrderColumn, startNum, endNum);
-                    IDataReader dataReader;
-                    if (request.SqlWhereParam != null)
+                    responsResult.TotalCount = GetCount<T>(connectionStr, searchEntity);
+                    if (responsResult.TotalCount > 0)
                     {
-                        dataReader = dbBase.ExecuteReaderWithParam(connectionStr, pageSql.ToString(), CommandType.Text, request.SqlWhereParam);
-                    }
-                    else
-                    {
-                        dataReader = dbBase.ExecuteReader(connectionStr, pageSql.ToString(), CommandType.Text, null);
-                    }
-                    if (dataReader != null)
-                    {
-                        List<T> list = new List<T>();
-                        DataReaderUtility<T> readBuild = DataReaderUtility<T>.GetInstance(dataReader);
-                        while (dataReader.Read())
+                        if (string.IsNullOrEmpty(searchEntity.ColumnSql))
                         {
-                            list.Add(readBuild.Map(dataReader));
+                            searchEntity.ColumnSql = "b.*";
                         }
-                        dataResult.Data = list;
+                        if (string.IsNullOrEmpty(searchEntity.SortColumn))
+                        {
+                            searchEntity.SortColumn = idColumn.ColumnName;
+                            searchEntity.SortMethod = "asc";
+                        }
+                        StringBuilder cmdText = new StringBuilder();
+                        cmdText.AppendFormat("select {0}  from ", searchEntity.ColumnSql);
+                        cmdText.Append("(");
+                        cmdText.AppendFormat("select ROW_NUMBER() over(order by {0} {1}) num,{2}  from {3} ", searchEntity.SortColumn, searchEntity.SortMethod,idColumn.ColumnName ,tableName);
+                        if (!string.IsNullOrEmpty(searchEntity.WhereSql))
+                        {
+                            cmdText.AppendFormat("where {0} ", searchEntity.WhereSql);
+                        }
+                        cmdText.Append(") ");
+                        cmdText.AppendFormat("a inner join {0} b on a.{1}=b.{1} and  a.num between {2} and {3} ", tableName,idColumn.ColumnName, startNum, endNum);
+                        IDataReader dataReader;
+                        if (searchEntity.WhereParam != null)
+                        {
+                          dataReader = SqlDbBase.ExecuteReaderWithParam(connectionStr, cmdText.ToString(), CommandType.Text, searchEntity.WhereParam);
+                        }
+                        else
+                        {
+                          dataReader = SqlDbBase.ExecuteReader(connectionStr, cmdText.ToString(), CommandType.Text, null);
+                        }
+                        responsResult.Data=Map<T>(dataReader);
                     }
                 }
                 #endregion
@@ -116,7 +86,7 @@ namespace Gc.Db
             {
                 throw ex;
             }
-            return dataResult;
+            return responsResult;
         }
 
         #endregion

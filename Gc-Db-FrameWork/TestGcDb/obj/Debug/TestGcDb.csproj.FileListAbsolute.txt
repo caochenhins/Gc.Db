@@ -16,3 +16,14 @@ E:\work\program-work\net-work\Gc-Db-FrameWork\TestGcDb\bin\Debug\Gc.Db.pdb
 E:\work\program-work\net-work\Gc-Db-FrameWork\TestGcDb\obj\Debug\TestGcDb.csprojResolveAssemblyReference.cache
 E:\work\program-work\net-work\Gc-Db-FrameWork\TestGcDb\obj\Debug\TestGcDb.exe
 E:\work\program-work\net-work\Gc-Db-FrameWork\TestGcDb\obj\Debug\TestGcDb.pdb
+E:\郭超\work\github\Gc.Db\Gc-Db-FrameWork\TestGcDb\bin\Debug\TestGcDb.exe.config
+E:\郭超\work\github\Gc.Db\Gc-Db-FrameWork\TestGcDb\obj\Debug\TestGcDb.exe
+E:\郭超\work\github\Gc.Db\Gc-Db-FrameWork\TestGcDb\obj\Debug\TestGcDb.pdb
+E:\郭超\work\github\Gc.Db\Gc-Db-FrameWork\TestGcDb\bin\Debug\TestGcDb.exe
+E:\郭超\work\github\Gc.Db\Gc-Db-FrameWork\TestGcDb\bin\Debug\TestGcDb.pdb
+E:\郭超\work\github\Gc.Db\Gc-Db-FrameWork\TestGcDb\bin\Debug\Gc.Data.dll
+E:\郭超\work\github\Gc.Db\Gc-Db-FrameWork\TestGcDb\bin\Debug\Gc.Db.dll
+E:\郭超\work\github\Gc.Db\Gc-Db-FrameWork\TestGcDb\bin\Debug\MySql.Data.dll
+E:\郭超\work\github\Gc.Db\Gc-Db-FrameWork\TestGcDb\bin\Debug\Gc.Data.pdb
+E:\郭超\work\github\Gc.Db\Gc-Db-FrameWork\TestGcDb\bin\Debug\Gc.Db.pdb
+E:\郭超\work\github\Gc.Db\Gc-Db-FrameWork\TestGcDb\obj\Debug\TestGcDb.csprojResolveAssemblyReference.cache

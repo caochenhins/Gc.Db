@@ -2,3 +2,7 @@ E:\郭超\work\Gc-Db-FrameWork\Gc-Db-FrameWork\Gc.Data\bin\Release\Gc.Data.dll
 E:\郭超\work\Gc-Db-FrameWork\Gc-Db-FrameWork\Gc.Data\bin\Release\Gc.Data.pdb
 E:\郭超\work\Gc-Db-FrameWork\Gc-Db-FrameWork\Gc.Data\obj\Release\Gc.Data.dll
 E:\郭超\work\Gc-Db-FrameWork\Gc-Db-FrameWork\Gc.Data\obj\Release\Gc.Data.pdb
+E:\郭超\work\github\Gc.Db\Gc-Db-FrameWork\Gc.Data\obj\Release\Gc.Data.dll
+E:\郭超\work\github\Gc.Db\Gc-Db-FrameWork\Gc.Data\obj\Release\Gc.Data.pdb
+E:\郭超\work\github\Gc.Db\Gc-Db-FrameWork\Gc.Data\bin\Release\Gc.Data.dll
+E:\郭超\work\github\Gc.Db\Gc-Db-FrameWork\Gc.Data\bin\Release\Gc.Data.pdb

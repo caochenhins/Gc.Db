@@ -34,10 +34,10 @@ namespace TestGcDb
             //userDao.Delete();
 
             //事务用法
-            userDao.TransOperator1();
+            //userDao.TransOperator1();
 
-            //事务用法2
-            userDao.TransOperator2();
+            ////事务用法2
+            //userDao.TransOperator2();
 
             //查询
             userDao.GetList();

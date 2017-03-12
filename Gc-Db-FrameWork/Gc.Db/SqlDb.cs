@@ -9,41 +9,31 @@ using System.Threading.Tasks;
 
 namespace Gc.Db
 {
-   public class SqlDb
+    public class SqlDb : ISqlDb
     {
        #region Constants and Fields 
 
        /// <summary>
        /// 数据库类型
        /// </summary>
-       public virtual GcEnumDbType dbType {get;set;}
+       public virtual GcEnumDbType DbType {get;set;}
 
        /// <summary>
        /// 数据库对应参数关键字
        /// </summary>
-       public virtual string dbPramStr {get;set;}
+       public virtual string DbPramStr {get;set;}
 
        /// <summary>
-       /// 数据为操作对象
+       /// 数据操作对象
        /// </summary>
-       public DbBase dbBase { get; set; }
+       public virtual DbUtility SqlDbBase { get; set; }
 
        #endregion
 
        #region Public Methods
 
        /// <summary>
-       /// 构造函数
-       /// </summary>
-       public SqlDb()
-       {
-           dbType = GcEnumDbType.MsSql;
-           dbPramStr = new DbOperator(dbType).CreateDbParameterStr();
-           dbBase = new DbBase(dbType);
-       }
-
-       /// <summary>
-       /// 执行增、删、改操作,返回影响行数--create by joyet
+       /// 执行增、删、改操作,返回影响行数
        /// </summary>
        /// <param name="connectionStr">数据库字符串连接</param>
        /// <param name="cmdText">SQL语句/存储过程/参数化SQL语句</param>
@@ -55,7 +45,7 @@ namespace Gc.Db
            int result = 0;
             try
             {
-                result = dbBase.Execute(connectionStr, cmdText, cmdType, dbParams);
+                result = SqlDbBase.Execute(connectionStr, cmdText, cmdType, dbParams);
             }
             catch (Exception ex)
             {
@@ -65,19 +55,19 @@ namespace Gc.Db
        }
 
         /// <summary>
-        /// 执行增、删、改操作,返回影响行数--create by joyet
+        /// 执行增、删、改操作,返回影响行数
         /// </summary>
         /// <param name="connectionStr">数据库字符串连接</param>
         /// <param name="cmdText">SQL语句/参数化SQL语句/存储过程</param>
         /// <param name="cmdType">命令类型:SQL语句/存储过程</param>
-        /// <param name="objParam">object参数</param>
+       /// <param name="param">object参数</param>
         /// <returns>int</returns>
-       public virtual int ExecuteWithParam(string connectionStr, string cmdText, CommandType cmdType = CommandType.Text, object objParam = null)
+       public virtual int ExecuteWithParam(string connectionStr, string cmdText, CommandType cmdType = CommandType.Text, object param = null)
        {
            int result = 0;
             try
             {
-                result = dbBase.ExecuteWithParam(connectionStr, cmdText, cmdType, objParam);
+                result = SqlDbBase.ExecuteWithParam(connectionStr, cmdText, cmdType, param);
             }
             catch (Exception ex)
             {
@@ -87,7 +77,7 @@ namespace Gc.Db
        }
 
         /// <summary>
-        /// 执行查询操作,返回DataSet--create by joyet
+        /// 执行查询操作,返回DataSet
         /// </summary>
         /// <param name="connectionStr">数据库字符串连接></param>
         /// <param name="cmdText">SQL语句/参数化SQL语句/存储过程</param>
@@ -99,7 +89,7 @@ namespace Gc.Db
             DataSet result;
             try
             {
-                result = dbBase.ExecuteQuery(connectionStr, cmdText, cmdType, dbParams);
+                result = SqlDbBase.ExecuteQuery(connectionStr, cmdText, cmdType, dbParams);
             }
             catch (Exception ex)
             {
@@ -109,19 +99,19 @@ namespace Gc.Db
         }
 
         /// <summary>
-        /// 执行查询操作,返回DataSet--create by joyet
+        /// 执行查询操作,返回DataSet
         /// </summary>
         /// <param name="connectionStr">数据库字符串连接</param>
         /// <param name="cmdText">SQL语句/参数化SQL语句/存储过程</param>
         /// <param name="cmdType">命令类型:SQL语句/存储过程</param>
         /// <param name="param">object参数</param>
         /// <returns>DataSet</returns>
-        public virtual DataSet ExecuteQueryWithParam(string connectionStr, string cmdText, CommandType cmdType = CommandType.Text, object objParam = null)
+        public virtual DataSet ExecuteQueryWithParam(string connectionStr, string cmdText, CommandType cmdType = CommandType.Text, object param = null)
         {
             DataSet result;
             try
             {
-                result = dbBase.ExecuteQueryWithParam(connectionStr, cmdText, cmdType, objParam);
+                result = SqlDbBase.ExecuteQueryWithParam(connectionStr, cmdText, cmdType, param);
             }
             catch (Exception ex)
             {
@@ -131,7 +121,7 @@ namespace Gc.Db
         }
 
         /// <summary>
-        /// 执行查询操作,返回IDataReader--create by joyet
+        /// 执行查询操作,返回IDataReader
         /// </summary>
         /// <param name="connectionStr"数据库字符串连接></param>
         /// <param name="cmdText">SQL语句/参数化SQL语句/存储过程</param>
@@ -143,7 +133,7 @@ namespace Gc.Db
             IDataReader result;
             try
             {
-                result = dbBase.ExecuteReader(connectionStr, cmdText, cmdType, dbParams);
+                result = SqlDbBase.ExecuteReader(connectionStr, cmdText, cmdType, dbParams);
             }
             catch (Exception ex)
             {
@@ -153,19 +143,19 @@ namespace Gc.Db
         }
 
         /// <summary>
-        /// 执行查询操作,返回IDataReader--create by joyet
+        /// 执行查询操作,返回IDataReader
         /// </summary>
         /// <param name="connectionStr">数据库字符串连接</param>
         /// <param name="cmdText">SQL语句/参数化SQL语句/存储过程</param>
         /// <param name="cmdType">命令类型:SQL语句/存储过程</param>
-        /// <param name="objParam">object参数</param>
+        /// <param name="param">object参数</param>
         /// <returns>IDataReader</returns>
-        public virtual IDataReader ExecuteReaderWithParam(string connectionStr, string cmdText, CommandType cmdType = CommandType.Text, object objParam = null)
+        public virtual IDataReader ExecuteReaderWithParam(string connectionStr, string cmdText, CommandType cmdType = CommandType.Text, object param = null)
         {
             IDataReader result;
             try
             {
-                result = dbBase.ExecuteReaderWithParam(connectionStr, cmdText, cmdType, objParam);
+                result = SqlDbBase.ExecuteReaderWithParam(connectionStr, cmdText, cmdType, param);
             }
             catch (Exception ex)
             {
@@ -175,7 +165,7 @@ namespace Gc.Db
         }
 
         /// <summary>
-        /// 执行查询操作,返回object--create by joyet
+        /// 执行查询操作,返回object
         /// </summary>
         /// <param name="connectionStr">数据库字符串连接</param>
         /// <param name="cmdText">SQL语句/参数化SQL语句/存储过程</param>
@@ -187,7 +177,7 @@ namespace Gc.Db
             object result;
             try
             {
-                result = dbBase.ExecuteScalar(connectionStr, cmdText, cmdType, dbParams);
+                result = SqlDbBase.ExecuteScalar(connectionStr, cmdText, cmdType, dbParams);
             }
             catch (Exception ex)
             {
@@ -197,19 +187,19 @@ namespace Gc.Db
         }
 
         /// <summary>
-        /// 执行查询操作,返回object--create by joyet
+        /// 执行查询操作,返回object
         /// </summary>
         /// <param name="connectionStr">数据库字符串连接</param>
         /// <param name="cmdText">SQL语句/参数化SQL语句/存储过程</param>
         /// <param name="cmdType">命令类型:SQL语句/存储过程</param>
-        /// <param name="objParam">object参数</param>
+        /// <param name="param">object参数</param>
         /// <returns>object</returns>
-        public virtual object ExecuteScalarWithParam(string connectionStr, string cmdText, CommandType cmdType = CommandType.Text, object objParam = null)
+        public virtual object ExecuteScalarWithParam(string connectionStr, string cmdText, CommandType cmdType = CommandType.Text, object param = null)
         {
             object result;
             try
             {
-                result = dbBase.ExecuteScalarWithParam(connectionStr, cmdText, cmdType, objParam);
+                result = SqlDbBase.ExecuteScalarWithParam(connectionStr, cmdText, cmdType, param);
             }
             catch (Exception ex)
             {
@@ -218,9 +208,8 @@ namespace Gc.Db
             return result;
         }
 
-       
         /// <summary>
-        /// 执行添加操作,返回object(如果设置获取自动增长值,返回为自动增长值,否则返回值为影响行数)--create by joyet
+        /// 执行添加操作,返回object(如果设置获取自动增长值,返回为自动增长值,否则返回值为影响行数)
         /// </summary>
         /// <typeparam name="T">实体模型名称</typeparam>
         /// <param name="connectionStr">数据库字符串连接</param>
@@ -232,7 +221,7 @@ namespace Gc.Db
             try
             {
                 #region  初始相关变量定义
-                var dbBase = new DbBase(dbType);
+                //var dbBase = new DbBase(dbType);
                 bool isHaveColumn = false;
                 bool isGetIdentityValue = false;
                 List<EntityColumn> noneIdentityColumns = null;
@@ -276,13 +265,13 @@ namespace Gc.Db
                     foreach (EntityColumn column in noneIdentityColumns)
                     {
                         fieldStr.Append(column.ColumnName);
-                        paramStr.Append(dbPramStr + column.ColumnName);
+                        paramStr.Append(DbPramStr + column.ColumnName);
                         if (i != (noneIdentityColumns.Count - 1))
                         {
                             fieldStr.Append(",");
                             paramStr.Append(",");
                         }
-                        var dbParam = new DbOperator(dbType).CreateDbParameter(column.ColumnName, column.ColumnValue);
+                        var dbParam = new AdoNetUtility(DbType).CreateDbParameter(column.ColumnName, column.ColumnValue);
                         dbParamList.Add(dbParam);
                         i++;
                     }
@@ -293,11 +282,11 @@ namespace Gc.Db
                     #region 对要获取自动增长字段操作
                     if (isGetIdentityValue)
                     {
-                        if ((int)dbType == (int)GcEnumDbType.MsSql)
+                        if ((int)DbType == (int)GcEnumDbType.MsSql)
                         {
                             sqlBuild.Append("select @@identity;");
                         }
-                        else if ((int)dbType == (int)GcEnumDbType.MsSql)
+                        else if ((int)DbType == (int)GcEnumDbType.MsSql)
                         {
                             sqlBuild.Append("select @@identity;");
                         }
@@ -319,7 +308,7 @@ namespace Gc.Db
         }
 
         /// <summary>
-        /// 执行删除数据操作,返回影响行数--create by joyet
+        /// 执行删除数据操作,返回影响行数
         /// </summary>
         /// <typeparam name="T">实体模型名称</typeparam>
         /// <param name="connectionStr">数据库字符串连接</param>
@@ -337,9 +326,9 @@ namespace Gc.Db
                     string tableName = type.Name;
                     List<IDbDataParameter> dbParamList = new List<IDbDataParameter>();
                     StringBuilder cmdText = new StringBuilder();
-                    cmdText.AppendFormat("delete from {0} where {1}={2}", tableName, column.ColumnName, dbPramStr + column.ColumnName);
+                    cmdText.AppendFormat("delete from {0} where {1}={2}", tableName, column.ColumnName, DbPramStr + column.ColumnName);
                     IDbDataParameter[] dbParameters = {
-                      new DbOperator(dbType).CreateDbParameter(column.ColumnName, column.ColumnValue)
+                      new AdoNetUtility(DbType).CreateDbParameter(column.ColumnName, column.ColumnValue)
                     };
                     result = Execute(connectionStr, cmdText.ToString(), CommandType.Text, dbParameters);
                 }
@@ -352,7 +341,7 @@ namespace Gc.Db
         }
 
         /// <summary>
-        /// 执行编辑操作,返回影响行数--create by joyet
+        /// 执行编辑操作,返回影响行数
         /// </summary>
         /// <typeparam name="T">实体模型名称</typeparam>
         /// <param name="connectionStr">数据库字符串连接</param>
@@ -364,7 +353,7 @@ namespace Gc.Db
             try
             {
                 #region 初始相关变量定义
-                var dbOperator = new DbOperator(dbType);
+                var dbOperator = new AdoNetUtility(DbType);
                 EntityColumn idColumn = null;
                 List<EntityColumn> noneIdColumnList = null;
                 bool isHaveColumn = false;
@@ -401,7 +390,7 @@ namespace Gc.Db
                     for (int i = 0; i < noneIdColumnList.Count; i++)
                     {
                         EntityColumn column = noneIdColumnList[i];
-                        cmdText.AppendFormat("{0}={1}", column.ColumnName, dbPramStr + column.ColumnName);
+                        cmdText.AppendFormat("{0}={1}", column.ColumnName, DbPramStr + column.ColumnName);
                         if (i != (noneIdColumnList.Count - 1))
                         {
                             cmdText.Append(",");
@@ -409,7 +398,7 @@ namespace Gc.Db
                         var dbParam = dbOperator.CreateDbParameter(column.ColumnName, column.ColumnValue);
                         dbParamList.Add(dbParam);
                     }
-                    cmdText.AppendFormat(" where {0}={1}", idColumn.ColumnName, dbPramStr + idColumn.ColumnName);
+                    cmdText.AppendFormat(" where {0}={1}", idColumn.ColumnName, DbPramStr + idColumn.ColumnName);
                     var idDbParam = dbOperator.CreateDbParameter(idColumn.ColumnName, idColumn.ColumnValue);
                     dbParamList.Add(idDbParam);
                     result = Execute(connectionStr, cmdText.ToString(), CommandType.Text, dbParamList.ToArray());
@@ -424,13 +413,13 @@ namespace Gc.Db
         }
 
         /// <summary>
-        /// 根据实体主键值查询数据,返回单个实体对象--create by joyet
+        /// 根据实体主键值查询数据,返回单个实体对象
         /// </summary>
         /// <typeparam name="T">实体模型名称</typeparam>
         /// <param name="connectionStr">数据库字符串连接</param>
         /// <param name="Id">主键值</param>
         /// <returns>T</returns>
-        public virtual T Find<T>(string connectionStr, object Id)
+        public virtual T QueryFirst<T>(string connectionStr, object Id)
         {
             T result = default(T);
             try
@@ -438,28 +427,19 @@ namespace Gc.Db
                 EntityColumn column = new EntityColumnUtility().GetIdColumn<T>(Id);
                 if (column != null)
                 {
-                    var dbBase = new DbBase(dbType);
+                    var dbBase = new DbUtility(DbType);
                     Type type = typeof(T);
                     string tableName = type.Name;
                     StringBuilder cmdText = new StringBuilder();
-                    cmdText.AppendFormat("select * from {0} where {1}={2}", tableName, column.ColumnName, dbPramStr + column.ColumnName);
+                    cmdText.AppendFormat("select * from {0} where {1}={2}{3}", tableName, column.ColumnName, DbPramStr, column.ColumnName);
                     IDbDataParameter[] dbParameters = {
-                       new DbOperator(dbType).CreateDbParameter(column.ColumnName,column.ColumnValue)
-                     };
-                    IDataReader read = ExecuteReader(connectionStr, cmdText.ToString(), CommandType.Text, dbParameters);
-                    if (read != null)
+                       new AdoNetUtility(DbType).CreateDbParameter(column.ColumnName,column.ColumnValue)
+                    };
+                    IDataReader dataReader = ExecuteReader(connectionStr, cmdText.ToString(), CommandType.Text, dbParameters);
+                    List<T> list = Map<T>(dataReader);
+                    if (list.Count > 0)
                     {
-                        List<T> list = new List<T>();
-                        DataReaderUtility<T> readBuild = DataReaderUtility<T>.GetInstance(read);
-                        if(read.Read())
-                        {
-                            var entity = readBuild.Map(read);
-                            list.Add(entity);
-                        }
-                        if (list.Count > 0)
-                        {
-                            result = list[0];
-                        }
+                        result = list[0];
                     }
                 }
             }
@@ -471,49 +451,43 @@ namespace Gc.Db
         }
 
         /// <summary>
-        /// 执行查询数据操作,返回泛型列表--create by joyet
+        /// 执行查询数据操作,返回泛型列表
         /// </summary>
         /// <typeparam name="T">实体模型名称</typeparam>
         /// <param name="connectionStr">数据库字符串连接</param>
-        /// <param name="sqlWhere">参数化/非参数化查询条件</param>
-        /// <param name="orderFilter">排序条件</param>
-        /// <param name="objParam">object参数</param>
-        /// <returns>List<T></returns>
-        public virtual List<T> Select<T>(string connectionStr, string sqlWhere, string orderFilter, object objParam)
+        /// <param name="querySearch">查询对象</param>
+        /// <returns></returns>
+        public virtual List<T> Query<T>(string connectionStr, SearchEntity querySearch)
         {
             List<T> result = null;
             try
             {
-                IDataReader read;
+                IDataReader dataReader;
                 Type type = typeof(T);
                 string tableName = type.Name;
                 StringBuilder cmdText = new StringBuilder();
-                cmdText.AppendFormat("select * from [{0}] ", tableName);
-                if (!string.IsNullOrEmpty(sqlWhere))
+                if (string.IsNullOrEmpty(querySearch.ColumnSql))
                 {
-                    cmdText.Append(" where " + sqlWhere);
+                    querySearch.ColumnSql = "*";
                 }
-                if (!string.IsNullOrEmpty(orderFilter))
+                cmdText.AppendFormat("select {0} from {1} ", querySearch.ColumnSql, tableName);
+                if (!string.IsNullOrEmpty(querySearch.WhereSql))
                 {
-                    cmdText.Append(" order by " + orderFilter);
+                    cmdText.AppendFormat("where {0} ", querySearch.WhereSql);
                 }
-                if (objParam != null)
+                if (!string.IsNullOrEmpty(querySearch.SortColumn) && !string.IsNullOrEmpty(querySearch.SortMethod))
                 {
-                    read = ExecuteReaderWithParam(connectionStr, cmdText.ToString(), CommandType.Text, objParam);
+                    cmdText.AppendFormat("order by {0} {1}", querySearch.SortColumn,querySearch.SortMethod);
+                }
+                if (querySearch.WhereParam != null)
+                {
+                    dataReader = ExecuteReaderWithParam(connectionStr, cmdText.ToString(), CommandType.Text, querySearch.WhereParam);
                 }
                 else
                 {
-                    read = ExecuteReader(connectionStr, cmdText.ToString(), CommandType.Text, null);
+                    dataReader = ExecuteReader(connectionStr, cmdText.ToString(), CommandType.Text, null);
                 }
-                if (read != null)
-                {
-                    result = new List<T>();
-                    DataReaderUtility<T> readBuild = DataReaderUtility<T>.GetInstance(read);
-                    while (read.Read())
-                    {
-                        result.Add(readBuild.Map(read));
-                    }
-                }
+                result = Map<T>(dataReader);
             }
             catch (Exception ex)
             {
@@ -523,39 +497,31 @@ namespace Gc.Db
         }
 
         /// <summary>
-        /// 执行查询数据操作,返回泛型列表--create by joyet
+        /// 执行查询数据操作,返回泛型列表
         /// </summary>
         /// <typeparam name="T">实体模型名称</typeparam>
         /// <param name="connectionStr">数据库字符串连接</param>
         /// <param name="cmdText">参数化/非参数化SQL语句/存储过程</param>
         /// <param name="cmdType">命令类型:SQL语句/存储过程</param>
-        /// <param name="objParam">object参数</param>
+        /// <param name="param">object参数</param>
         /// <returns>List<T></returns>
-        public virtual List<T> Select<T>(string connectionStr, string cmdText, CommandType cmdType, object objParam)
+        public virtual List<T> Query<T>(string connectionStr, string cmdText, CommandType cmdType, object param)
         {
             List<T> result = null;
             try
             {
-                IDataReader read;
+                IDataReader dataReader;
                 if (!string.IsNullOrEmpty(cmdText))
                 {
-                    if (objParam != null)
+                    if (param != null)
                     {
-                        read = ExecuteReaderWithParam(connectionStr, cmdText, cmdType, objParam);
+                        dataReader = ExecuteReaderWithParam(connectionStr, cmdText, cmdType, param);
                     }
                     else
                     {
-                        read = ExecuteReader(connectionStr, cmdText, cmdType, null);
+                        dataReader = ExecuteReader(connectionStr, cmdText, cmdType, null);
                     }
-                    if (read != null)
-                    {
-                        result = new List<T>();
-                        DataReaderUtility<T> readBuild = DataReaderUtility<T>.GetInstance(read);
-                        while (read.Read())
-                        {
-                            result.Add(readBuild.Map(read));
-                        }
-                    }
+                    result=Map<T>(dataReader);
                 }
               
             }
@@ -567,16 +533,89 @@ namespace Gc.Db
         }
 
         /// <summary>
-        /// 执行分页数据查询操作,返回PageResponseData--create by joyet
+        /// 执行数据查询操作,统计查询记录数
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="connectionStr"></param>
-        /// <param name="request"></param>
+        /// <param name="searchEntity"></param>
         /// <returns></returns>
-        public virtual PageResponseData GetPageList<T>(string connectionStr, PageRequestData request)
+        public virtual int GetCount<T>(string connectionStr, SearchEntity searchEntity)
         {
-            PageResponseData dataResult = new PageResponseData();
-            return dataResult;
+            int result = 0;
+            try
+            {
+                Type type = typeof(T);
+                string tableName = type.Name;
+
+                #region 查询总条数
+                StringBuilder cmdText = new StringBuilder();
+                cmdText.AppendFormat("select count(*) from {0}  ", tableName);
+                if (!string.IsNullOrEmpty(searchEntity.WhereSql))
+                {
+                    cmdText.AppendFormat(" where {0} ", searchEntity.WhereSql);
+                }
+                object totalCount;
+                if (searchEntity.WhereParam != null)
+                {
+                    totalCount = ExecuteScalarWithParam(connectionStr, cmdText.ToString(), CommandType.Text, searchEntity.WhereParam);
+                }
+                else
+                {
+                    totalCount = ExecuteScalar(connectionStr, cmdText.ToString(), CommandType.Text, null);
+                }
+                if (totalCount != null)
+                {
+                    result = Convert.ToInt32(totalCount);
+                }
+                #endregion
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 执行分页数据查询操作,返回PageResponseData
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connectionStr"></param>
+        /// <param name="pageRequest"></param>
+        /// <returns></returns>
+        public virtual PageResponseData GetPageList<T>(string connectionStr, PageRequestData pageRequest)
+        {
+            PageResponseData responsResult = new PageResponseData();
+            return responsResult;
+        }
+
+        /// <summary>
+        /// 通过Emit反射,将IDataReader转换泛型列表
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dataReader"></param>
+        /// <returns></returns>
+        public List<T> Map<T>(IDataReader dataReader)
+        {
+            List<T> result = null;
+            try
+            {
+                if (dataReader != null)
+                {
+                    List<T> list = new List<T>();
+                    DataReaderUtility<T> readBuild = DataReaderUtility<T>.GetInstance(dataReader);
+                    while (dataReader.Read())
+                    {
+                        list.Add(readBuild.Map(dataReader));
+                    }
+                    result = list;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return result;
         }
 
         /// <summary>
@@ -586,7 +625,7 @@ namespace Gc.Db
         {
             try
             {
-                dbBase.StartTrans();
+                SqlDbBase.StartTrans();
             }
             catch (Exception ex)
             {
@@ -601,7 +640,7 @@ namespace Gc.Db
         {
             try
             {
-                dbBase.CloseTrans();
+                SqlDbBase.CloseTrans();
             }
             catch (Exception ex)
             {
@@ -609,6 +648,16 @@ namespace Gc.Db
             }
         }
 
+        /// <summary>
+        /// 对象初始化
+        /// </summary>
+        public virtual void DbInsInit()
+        {
+            DbPramStr = new AdoNetUtility(DbType).CreateDbParamCharacter();
+            SqlDbBase = new DbUtility(DbType);
+        }
+
        #endregion
     }
 }
+

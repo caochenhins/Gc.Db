@@ -10,20 +10,6 @@ namespace Gc.Db
 {
     public class MySqlDb : SqlDb, ISqlDb
     {
-        #region Constants and Fields
-
-        /// <summary>
-        /// 数据库类型
-        /// </summary>
-        public override GcEnumDbType dbType { get; set; }
-
-        /// <summary>
-        /// 数据库对应参数关键字
-        /// </summary>
-        public override string dbPramStr { get; set; }
-
-        #endregion
-
         #region Public Methods
 
         /// <summary>
@@ -31,89 +17,72 @@ namespace Gc.Db
        /// </summary>
         public MySqlDb()
        {
-           dbType = GcEnumDbType.MySql;
-           dbPramStr = new DbOperator(dbType).CreateDbParameterStr();
+           DbType = GcEnumDbType.MySql;
+           DbInsInit();
        }
 
         /// <summary>
-        /// 执行分页数据查询操作,返回PageResponseData--create by joyet
+        /// 执行分页数据查询操作,返回PageResponseData
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="connectionStr"></param>
         /// <param name="request"></param>
         /// <returns></returns>
-        public override PageResponseData GetPageList<T>(string connectionStr, PageRequestData request)
+        public override PageResponseData GetPageList<T>(string connectionStr, PageRequestData pageRequest)
         {
-            PageResponseData dataResult = new PageResponseData();
+            PageResponseData responsResult = new PageResponseData();
             try
             {
                 #region 相关变量定义
-                var dbBase = new DbBase(dbType);
                 Type type = typeof(T);
                 string tableName = type.Name;
-                int startNum = request.PageSize * (request.PageIndex - 1);
-                #endregion
-
-                #region 查询总条数
-                if (string.IsNullOrEmpty(request.OrderColumn) && string.IsNullOrEmpty(request.OrderSort))
-                {
-                    EntityColumn column = new EntityColumnUtility().GetIdColumn<T>(null);
-                    if (column != null)
-                    {
-                        request.OrderColumn = column.ColumnName;
-                        request.OrderSort = "asc";
-                    }
-                }
-                StringBuilder commonFilter = new StringBuilder();
-                commonFilter.AppendFormat(" from {0}  ", tableName);
-                if (!string.IsNullOrEmpty(request.SqlWhere))
-                {
-                    commonFilter.AppendFormat(" where {0} ", request.SqlWhere);
-                }
-                StringBuilder countSql = new StringBuilder("select count(*)  ");
-                countSql.AppendFormat(commonFilter.ToString());
-                object totalNumObj = dbBase.ExecuteScalar(connectionStr, countSql.ToString(), CommandType.Text, null);
-                if (totalNumObj != null)
-                {
-                    dataResult.TotalCount = Convert.ToInt32(totalNumObj);
-                }
+                int startNum = pageRequest.PageSize * (pageRequest.PageIndex - 1);
+                var searchEntity = pageRequest.SearchEntityObj;
                 #endregion
 
                 #region 分页查询处理
-                if (dataResult.TotalCount > 0)
-                {
-                   
-                    StringBuilder pageSql = new StringBuilder("select * ");
-                    pageSql.AppendFormat(commonFilter.ToString());
-                    pageSql.AppendFormat("order by {0} {1} ", request.OrderColumn, request.OrderSort);
-                    pageSql.AppendFormat("limit {0},{1} ", startNum, request.PageSize);
-                    IDataReader dataReader;
-                    if (request.SqlWhereParam != null)
-                    {
-                        dataReader = dbBase.ExecuteReaderWithParam(connectionStr, pageSql.ToString(), CommandType.Text, request.SqlWhereParam);
-                    }
-                    else
-                    {
-                        dataReader = dbBase.ExecuteReader(connectionStr, pageSql.ToString(), CommandType.Text, null);
-                    }
-                    if (dataReader != null)
-                    {
-                        List<T> list = new List<T>();
-                        DataReaderUtility<T> readBuild = DataReaderUtility<T>.GetInstance(dataReader);
-                        while (dataReader.Read())
-                        {
-                            list.Add(readBuild.Map(dataReader));
-                        }
-                        dataResult.Data = list;
-                    }
-                }
+                 EntityColumn idColumn = new EntityColumnUtility().GetIdColumn<T>(null);
+                 if (idColumn != null)
+                 {
+                     //查询记录结果数
+                     responsResult.TotalCount = GetCount<T>(connectionStr, searchEntity);
+                     if (responsResult.TotalCount > 0)
+                     {
+                         StringBuilder cmdText = new StringBuilder();
+                         if (string.IsNullOrEmpty(searchEntity.ColumnSql))
+                         {
+                             searchEntity.ColumnSql = "*";
+                         }
+                         if (string.IsNullOrEmpty(searchEntity.SortColumn))
+                         {
+                             searchEntity.SortColumn = idColumn.ColumnName;
+                         }
+                         cmdText.AppendFormat("select {0} from {1} ", searchEntity.ColumnSql, tableName);
+                         if (string.IsNullOrEmpty(searchEntity.WhereSql))
+                         {
+                             cmdText.AppendFormat("where {0} ", searchEntity.WhereSql);
+                         }
+                         cmdText.AppendFormat("order by {0} {1} ", searchEntity.SortColumn, searchEntity.SortMethod);
+                         cmdText.AppendFormat("limit {0},{1} ", startNum, pageRequest.PageSize);
+                         IDataReader dataReader;
+                         if (searchEntity.WhereParam != null)
+                         {
+                             dataReader = SqlDbBase.ExecuteReaderWithParam(connectionStr, cmdText.ToString(), CommandType.Text, searchEntity.WhereParam);
+                         }
+                         else
+                         {
+                             dataReader = SqlDbBase.ExecuteReader(connectionStr, cmdText.ToString(), CommandType.Text, null);
+                         }
+                         responsResult.Data = Map<T>(dataReader);
+                     }
+                 }
                 #endregion
             }
             catch (Exception ex)
             {
                 throw ex;
             }
-            return dataResult;
+            return responsResult;
         }
 
         #endregion
