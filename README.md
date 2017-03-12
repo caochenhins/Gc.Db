@@ -113,7 +113,7 @@ namespace TestGcDb
        public UserInfo GetModel()
         {
             int uid = 1;
-            UserInfo model = msDb.Find<UserInfo>(msDbConnStr, uid);
+            UserInfo model = msDb.QueryFirst<UserInfo>(msDbConnStr, uid);
             return model;
         }
 
