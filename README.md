@@ -117,10 +117,10 @@ namespace TestGcDb
             return model;
         }
 
-       /// <summary>
+       //// <summary>
        /// 查询object to in
        /// </summary>
-       /// <param name="uid"></param>
+       /// <returns></returns>
        public int  GetObject()
        {
            int num = 0;
@@ -139,15 +139,13 @@ namespace TestGcDb
        public void GetList()
         {
             //查询列表
-            List<UserInfo> list1 = msDb.Select<UserInfo>(msDbConnStr, "", "", null);
-            List<UserInfo> list2 = msDb.Select<UserInfo>(msDbConnStr, "UserId>0", "", null);
-            List<UserInfo> list3 = msDb.Select<UserInfo>(msDbConnStr, "", "CreateTime desc", null);
-            List<UserInfo> list4 = msDb.Select<UserInfo>(msDbConnStr, "UserId>@UserId", "CreateTime desc", new { UserId = 0 });
+            List<UserInfo> list2 = msDb.Query<UserInfo>(msDbConnStr, new SearchEntity() { WhereSql="UserId=0"});
+            List<UserInfo> list4 = msDb.Query<UserInfo>(msDbConnStr, new SearchEntity() { WhereSql = "UserId=@UserId", WhereParam = new { UserId = 0 } });
 
             //查询分页列表
-           PageResponseData result = msDb.GetPageList<UserInfo>(msDbConnStr, new PageRequestData());
+           PageResponseData result = new MySqlDb().GetPageList<UserInfo>(msDbConnStr, new PageRequestData());
            List<UserInfo> list6 = result.Data as List<UserInfo>;
-            int toatl = result.TotalCount;
+           int toatl = result.TotalCount;
         }
 
        /// <summary>
